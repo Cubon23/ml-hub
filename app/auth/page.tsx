@@ -1,91 +1,115 @@
-'use client'
-import { useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
+'use client'; 
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase'; 
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const supabase = createClientComponentClient()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [user, setUser] = useState<any>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+  // Check for active session on load
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
 
+  // Handle Registration
+  const handleSignUp = async () => {
+    const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      alert(error.message)
+      setMessage(error.message);
     } else {
-      router.push('/') // Redirect to home after success
+      setMessage('Success! Please check your email to confirm.');
     }
-    setLoading(false)
+  };
+
+  // Handle Login
+  const handleLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage('Login successful!');
+      setUser(data.user);
+    }
+  };
+
+  // Handle Logout
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setMessage('Logged out successfully.');
+  };
+
+  // Logged-In View
+  if (user) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '100px', fontFamily: 'Arial' }}>
+        <h2>Welcome to Machine Learning Hub</h2>
+        <p>Logged in as: <strong>{user.email}</strong></p>
+        <button 
+          onClick={handleLogout} 
+          style={{ padding: '10px 20px', cursor: 'pointer', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '4px' }}
+        >
+          Logout
+        </button>
+      </div>
+    );
   }
 
+  // Login/Register View
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#0a0b10]">
-      {/* Background Grid Decoration */}
-      <div className="absolute inset-0 z-0 opacity-20" 
-           style={{ backgroundImage: 'linear-gradient(#14161f 1px, transparent 1px), linear-gradient(90deg, #14161f 1px, transparent 1px)', 
-                    backgroundSize: '40px 40px' }}></div>
-
-      <div className="relative z-10 w-full max-w-md p-8 rounded-2xl bg-[#14161f]/80 backdrop-blur-xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '100px', fontFamily: 'Arial' }}>
+      <h2>Sign In / Register</h2>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '320px' }}>
+        <input 
+          type="email" 
+          placeholder="Enter Email" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)} 
+          style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc' }}
+        />
         
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#00e676]/10 border border-[#00e676]/20 mb-4">
-            <svg className="w-8 h-8 text-[#00e676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tighter text-white">ML-HUB</h1>
-          <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">Authentication Terminal v1.0</p>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Access Email</label>
-            <input 
-              required
-              type="email" 
-              className="tech-input w-full bg-[#0a0b10] border border-white/5 rounded-lg px-4 py-3 text-sm transition-all text-white outline-none focus:border-[#00e676]"
-              placeholder="user@ccis.ua.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Secure Password</label>
-            <input 
-              required
-              type="password" 
-              className="tech-input w-full bg-[#0a0b10] border border-white/5 rounded-lg px-4 py-3 text-sm transition-all text-white outline-none focus:border-[#00e676]"
-              placeholder="••••••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
+        <input 
+          type="password" 
+          placeholder="Enter Password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} 
+          style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc' }}
+        />
+        
+        <div style={{ display: 'flex', gap: '10px' }}>
           <button 
-            disabled={loading}
-            type="submit"
-            className="btn-cyber w-full mt-4 py-4 border border-[#00e676] text-[#00e676] rounded-lg font-bold text-xs uppercase tracking-[0.2em] hover:bg-[#00e676] hover:text-black transition-all disabled:opacity-50"
+            onClick={handleLogin} 
+            style={{ flex: 1, padding: '12px', cursor: 'pointer', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}
           >
-            {loading ? 'Authorizing...' : 'Authorize Access'}
+            Login
           </button>
-        </form>
-
-        <div className="mt-10 flex items-center justify-between opacity-30 text-[9px] font-mono text-gray-400">
-          <span>University of Antique</span>
-          <span className="h-px w-8 bg-gray-700"></span>
-          <span>CCIS Lab 04</span>
+          <button 
+            onClick={handleSignUp} 
+            style={{ flex: 1, padding: '12px', cursor: 'pointer', backgroundColor: '#2196F3', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+          >
+            Sign Up
+          </button>
         </div>
       </div>
+
+      {message && (
+        <p style={{ 
+          marginTop: '20px', 
+          color: message.includes('Success') || message.includes('successful') ? '#2e7d32' : '#d32f2f',
+          backgroundColor: message.includes('Success') || message.includes('successful') ? '#e8f5e9' : '#ffebee',
+          padding: '10px 20px',
+          borderRadius: '4px'
+        }}>
+          {message}
+        </p>
+      )}
     </div>
-  )
+  );
 }
