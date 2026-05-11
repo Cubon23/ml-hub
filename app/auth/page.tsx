@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 
+// v1.0.1 - Final ML-HUB UI Update
 export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -52,7 +53,7 @@ export default function AuthPage() {
             <input 
               required
               type="email" 
-              className="tech-input w-full bg-[#0a0b10] border border-white/5 rounded-lg px-4 py-3 text-sm transition-all text-white outline-none focus:border-[#00e676]"
+              className="tech-input"
               placeholder="user@ccis.ua.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +65,7 @@ export default function AuthPage() {
             <input 
               required
               type="password" 
-              className="tech-input w-full bg-[#0a0b10] border border-white/5 rounded-lg px-4 py-3 text-sm transition-all text-white outline-none focus:border-[#00e676]"
+              className="tech-input"
               placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -74,7 +75,7 @@ export default function AuthPage() {
           <button 
             disabled={loading}
             type="submit"
-            className="btn-cyber w-full mt-4 py-4 border border-[#00e676] text-[#00e676] rounded-lg font-bold text-xs uppercase tracking-[0.2em] hover:bg-[#00e676] hover:text-black transition-all disabled:opacity-50"
+            className="btn-cyber w-full mt-4 py-4 disabled:opacity-50"
           >
             {loading ? 'Authorizing...' : 'Authorize Access'}
           </button>

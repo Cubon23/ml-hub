@@ -2,35 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --background: #0a0b10;
-    --foreground: #e6e9ef;
-    --accent: #00e676;
-    --card-bg: #14161f;
+@layer base {
+  :root {
+      --background: #0a0b10;
+      --foreground: #e6e9ef;
+      --accent: #00e676;
+  }
+
+  body {
+      @apply bg-[#0a0b10] text-[#e6e9ef];
+      font-family: 'JetBrains Mono', monospace;
+  }
 }
 
-body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: 'JetBrains Mono', monospace, ui-monospace;
-}
+@layer components {
+  .btn-cyber {
+      @apply transition-all duration-300 uppercase tracking-widest border border-[#00e676] text-[#00e676] rounded-lg text-xs font-bold;
+  }
 
-/* Custom glowing effect for inputs */
-input:focus {
-    outline: none;
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
-}
+  .btn-cyber:hover {
+      @apply bg-[#00e676] text-[#000000] shadow-[0_0_20px_#00e676];
+  }
 
-/* Technical button hover */
-.btn-cyber {
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+  .tech-input {
+      @apply w-full bg-[#14161f] border border-white/10 rounded-lg px-4 py-3 text-sm transition-all text-white outline-none;
+  }
 
-    .btn-cyber:hover {
-        background-color: var(--accent);
-        color: #000;
-        box-shadow: 0 0 20px var(--accent);
-    }
+  .tech-input:focus {
+      @apply border-[#00e676] shadow-[0_0_10px_rgba(0,230,118,0.3)];
+  }
+}
